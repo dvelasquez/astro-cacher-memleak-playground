@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import ComplexComponent from '../components/withAstro/ComplexComponent.astro';
 import { createFixture } from '../data/fixtureType';
 
 const prerender = false;
@@ -15,15 +14,85 @@ const sampleFixture = createFixture({ sizeInKB: 5 });
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Complex Component Demo</title>
+		<title>Astro Cacher Memory Leak Playground</title>
 	</head>
 	<body class="min-h-screen bg-gray-100">
-		<div class="container mx-auto py-8">
-			<h1 class="text-4xl font-bold text-center text-blue-600 mb-8">Astro Complex Component Demo</h1>
-			<p class="text-center text-gray-600 mb-8">This demonstrates a complex component that takes time to render with multiple nested elements and rich styling.</p>
-			<a href="/only-astro" class="text-blue-600 hover:text-blue-800">An example with Astro components only</a>
-			<br />
-			<a href="/only-react" class="text-blue-600 hover:text-blue-800">An example with React components only</a>
+		<div class="container mx-auto py-8 px-4">
+			<h1 class="text-4xl font-bold text-center text-blue-600 mb-4">Astro Cacher Memory Leak Playground</h1>
+			<p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">
+				This playground demonstrates complex components with different rendering strategies and caching implementations. 
+				Use it to test performance, memory usage, and compare Astro vs React approaches.
+			</p>
+
+			<!-- Demo Section -->
+			<div class="mb-12">
+				<h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Component Demos</h2>
+				<div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+						<h3 class="text-xl font-semibold text-gray-800 mb-3">Astro Components Only</h3>
+						<p class="text-gray-600 mb-4">
+							Pure Astro implementation with server-side rendering. No client-side JavaScript, 
+							fastest initial load but no interactivity.
+						</p>
+						<a href="/only-astro" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+							View Astro Demo
+						</a>
+					</div>
+
+					<div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+						<h3 class="text-xl font-semibold text-gray-800 mb-3">React Components Only</h3>
+						<p class="text-gray-600 mb-4">
+							React components with client-side hydration. Full interactivity but requires 
+							JavaScript and may have slower initial load.
+						</p>
+						<a href="/only-react" class="inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+							View React Demo
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Cached Demos Section -->
+			<div class="mb-12">
+				<h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Cached Component Demos</h2>
+				<p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">
+					These demos use the CacherComponent wrapper to implement caching strategies. 
+					Useful for testing memory leaks and performance with repeated renders.
+				</p>
+				<div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+					<div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+						<h3 class="text-xl font-semibold text-gray-800 mb-3">Cached Astro Components</h3>
+						<p class="text-gray-600 mb-4">
+							Astro components wrapped with caching layer. Tests memory management 
+							and performance with the CacherComponent utility.
+						</p>
+						<a href="/cacher/only-astro" class="inline-block bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition-colors">
+							View Cached Astro Demo
+						</a>
+					</div>
+
+					<div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+						<h3 class="text-xl font-semibold text-gray-800 mb-3">Cached React Components</h3>
+						<p class="text-gray-600 mb-4">
+							React components wrapped with caching layer. Combines React interactivity 
+							with Astro caching for optimal performance testing.
+						</p>
+						<a href="/cacher/only-react" class="inline-block bg-orange-600 text-white px-6 py-2 rounded-md hover:bg-orange-700 transition-colors">
+							View Cached React Demo
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<!-- Development Info -->
+			<div class="mt-12 text-center text-sm text-gray-500">
+				<p class="mb-2">
+					<strong>Development Server:</strong> Run <code class="bg-gray-200 px-2 py-1 rounded">npm run dev</code> to start testing
+				</p>
+				<p>
+					<strong>Build & Preview:</strong> Use <code class="bg-gray-200 px-2 py-1 rounded">npm run build</code> and <code class="bg-gray-200 px-2 py-1 rounded">npm run preview</code> for production testing
+				</p>
+			</div>
 		</div>
 	</body>
 </html>
