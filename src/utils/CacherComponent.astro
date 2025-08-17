@@ -1,0 +1,44 @@
+---
+import { hash } from "@cacheable/utils";
+import cache from "./cache";
+
+interface PropsWithProps {
+  key: string;
+  ttl?: string;
+  props: Record<string, unknown>;
+  hash?: never;
+}
+
+interface PropsWithHash {
+  key: string;
+  ttl?: string;
+  props?: never;
+  hash: string;
+}
+
+type Props = PropsWithProps | PropsWithHash;
+
+const { key, ttl = "5m", props, hash: hashProp } = Astro.props;
+
+let cacheKey = key;
+if (hashProp) {
+  cacheKey = `${key}:${hashProp}`;
+}
+if (!hashProp && props) {
+  cacheKey = `${key}:${hash(props)}`;
+}
+
+// Get cached HTML if it is available.
+let html = await cache.get<string>(cacheKey);
+
+// Logging for demo purposes.
+console.debug({ key: cacheKey, cached: Boolean(html) });
+
+// If not available, render the child components and cache the result.
+if (!html) {
+  html = await Astro.slots.render("default");
+  await cache.set<string>(cacheKey, html, ttl);
+}
+---
+
+<Fragment set:html={html} />
