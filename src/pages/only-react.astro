@@ -1,0 +1,11 @@
+---
+import { ComplexComponent } from '../components/withReact/ComplexComponent.tsx';
+import { createFixture } from '../data/fixtureType';
+import Shell from '../layout/Shell.astro';
+
+const sampleFixture = createFixture({ sizeInKB: 200 });
+---
+
+<Shell title="React Complex Component Demo">
+  <ComplexComponent fixture={sampleFixture} client:load />
+</Shell>

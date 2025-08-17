@@ -1,0 +1,11 @@
+---
+import ComplexComponent from '../components/withAstro/ComplexComponent.astro';
+import { createFixture } from '../data/fixtureType';
+import Shell from '../layout/Shell.astro';
+
+const sampleFixture = createFixture({ sizeInKB: 200 });
+---
+
+<Shell title="Astro Complex Component Demo">
+  <ComplexComponent fixture={sampleFixture} />
+</Shell>

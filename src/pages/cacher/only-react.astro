@@ -1,0 +1,22 @@
+---
+import { ComplexComponent } from '../../components/withReact/ComplexComponent.tsx';
+import { createFixture, type FixtureType } from '../../data/fixtureType';
+import Shell from '../../layout/Shell.astro';
+import Cacher from '../../utils/CacherComponent.astro';
+import cache from '../../utils/cache';
+
+const prerender = false;
+
+let sampleFixture = await cache.get<FixtureType>("only-astro");
+
+if (!sampleFixture) {
+  sampleFixture = createFixture({ sizeInKB: 200 });
+  await cache.set("only-astro", sampleFixture, "1m");
+}
+---
+
+<Shell title="React Complex Component Demo">
+  <Cacher key="only-react" props={{sampleFixture}} ttl="2s">
+    <ComplexComponent fixture={sampleFixture} client:load />
+  </Cacher>
+</Shell>
