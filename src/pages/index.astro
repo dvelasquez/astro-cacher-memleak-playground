@@ -1,5 +1,12 @@
 ---
 import '../styles/global.css';
+import ComplexComponent from '../components/withAstro/ComplexComponent.astro';
+import { createFixture } from '../data/fixtureType';
+
+const prerender = false;
+
+// Create a sample fixture with children for demonstration
+const sampleFixture = createFixture({ sizeInKB: 5 });
 ---
 
 <html lang="en">
@@ -8,9 +15,14 @@ import '../styles/global.css';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Astro Complex Component Demo</title>
 	</head>
-	<body class="min-h-screen bg-gray-100 flex items-center justify-center">
-		<h1 class="text-4xl font-bold text-center text-blue-600 py-8">Astro + Tailwind CSS</h1>
+	<body class="min-h-screen bg-gray-100">
+		<div class="container mx-auto py-8">
+			<h1 class="text-4xl font-bold text-center text-blue-600 mb-8">Astro Complex Component Demo</h1>
+			<p class="text-center text-gray-600 mb-8">This demonstrates a complex component that takes time to render with multiple nested elements and rich styling.</p>
+			
+			<ComplexComponent fixture={sampleFixture} />
+		</div>
 	</body>
 </html>
