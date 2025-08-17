@@ -1,0 +1,45 @@
+---
+import type { FixtureType } from '../../data/fixtureType';
+import { formatDate } from './utils';
+
+interface Props {
+  fixture: FixtureType;
+}
+
+const { fixture } = Astro.props;
+---
+
+<div class="fixture-header bg-white rounded-lg shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-start space-x-4 min-w-0 flex-1">
+      <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+        {fixture.name.charAt(0).toUpperCase()}
+      </div>
+      <div class="min-w-0 flex-1">
+        <h1 class="text-3xl font-bold text-gray-900 leading-tight break-words">
+          {fixture.name}
+        </h1>
+        <div class="flex items-center space-x-2 mt-1 flex-wrap">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            ID: {fixture.id}
+          </span>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="text-right flex-shrink-0 ml-4">
+      <div class="text-sm text-gray-500">Created</div>
+      <div class="text-lg font-semibold text-gray-900">{formatDate(fixture.createdAt)}</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+</style>
