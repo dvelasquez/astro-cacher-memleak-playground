@@ -1,0 +1,49 @@
+# Cursor Project Rules: astro-cacher-memleak-playground
+
+## Context
+
+This repository is a minimal-yet-heavy Astro application designed to reproduce and study a suspected memory leak when using `cacheable` together with the current `CacherComponent` (`src/utils/CacherComponent.astro`). The app renders complex components, wraps their HTML with a short‑TTL cache, and is intended to be load-tested in a resource‑constrained container.
+
+## Key Files and Behavior
+
+- `src/utils/CacherComponent.astro`: Builds cache keys from a base `key` plus either an explicit `hash` or a hashed `props` object; caches the slotted HTML response for a TTL. Logs hit/miss to `console.debug`.
+- `src/utils/cache.ts`: Initializes a global `Cacheable` instance with default TTL `5m`.
+- `src/pages/cacher/only-astro.astro`: Heavy Astro render path, cached with short TTL (`2s`) and large fixture payload (≈200 KB).
+- `src/pages/cacher/only-react.astro`: Heavy React render path under the same caching strategy.
+- `Dockerfile` and `docker-compose.yml`: Multi-stage build, Node 22 runtime, port 4321, healthcheck.
+
+## How this repo is used
+
+1. Build and run with strict memory limits to amplify retention issues.
+2. Generate load against `/cacher/only-astro` and `/cacher/only-react`.
+3. Observe memory, GC traces, cache hit/miss logs, and latency.
+
+Suggested run flags (example):
+
+```bash
+docker run -p 4321:4321 -m 256m --cpus=1 \
+  -e NODE_OPTIONS="--max-old-space-size=192 --heapsnapshot-near-heap-limit=3 --trace-gc --trace_gc_verbose --report-on-fatalerror" \
+  astro-cacher-leak:latest
+```
+
+## Editing Rules
+
+- Keep changes minimal and tightly scoped to the test harness; avoid refactors unrelated to leak reproduction.
+- Preserve existing import formatting and indentation style.
+- Do not remove user comments or commented-out code unless necessary for functionality.
+- Favor functional, declarative TypeScript. Avoid enums; use interfaces and maps.
+- Use early returns and descriptive names. Prefer immutable patterns where practical.
+
+## Performance/Diagnostics
+
+- Prefer adjusting `sizeInKB` in `createFixture` and `ttl` in `Cacher` usage to tune pressure.
+- When adding diagnostics, use lightweight server-side logs; avoid client-side heavy debug.
+- Consider enabling Node flags via `NODE_OPTIONS` to capture GC traces and near-heap-limit snapshots.
+
+## Testing the Hypothesis
+
+- Compare memory behavior between Astro and React routes under identical caching.
+- Validate whether memory stabilizes after load ends. A continuous upward trend indicates retention.
+- Correlate cache churn (low TTL) with memory behavior.
+
+
