@@ -48,18 +48,22 @@ Build the multi-stage image and run with resource limits to amplify memory issue
 docker build -t astro-cacher-leak:latest .
 
 # Run with strict limits and Node diagnostics
-docker run \
+podman run \
   --rm \
   -p 4321:4321 \
   -m 256m --cpus=1 \
+  -v $(pwd)/metrics:/app/metrics \
   -e NODE_ENV=production \
   -e PORT=4321 \
+  -e METRICS_SAMPLER_ENABLED=1 \
+  -e METRICS_FILE=/app/metrics/app-metrics.ndjson \
+  -e METRICS_INTERVAL_MS=1000 \
   -e NODE_OPTIONS="--max-old-space-size=192 --heapsnapshot-near-heap-limit=3 --trace-gc --trace_gc_verbose --report-on-fatalerror" \
   --name astro-cacher-leak \
   astro-cacher-leak:latest
 
 # Alternatively, use docker-compose (then add limits on the CLI)
-docker compose up --build astro-app
+podman compose up --build astro-app
 ```
 
 Notes:
@@ -100,6 +104,9 @@ docker logs -f astro-cacher-leak
 
 # One-shot health check
 curl -s http://localhost:4321/health | jq
+
+# Tail NDJSON metrics (written inside container to /var/log, mounted to ./metrics)
+tail -f metrics/app-metrics.ndjson | jq .
 ```
 
 ## Tuning the repro
@@ -131,6 +138,62 @@ npm run preview   # preview the production build locally
 - Node: 22 (container), configurable locally
 - Port: 4321
 - Health: `/health`
+
+## In-app metrics sampler
+
+This repo ships a minimal metrics sampler that writes NDJSON lines to a file at a fixed interval. It records process memory, V8 heap stats, event loop delay, and cgroup (container) memory/CPU/pids.
+
+- Enable via env: `METRICS_SAMPLER_ENABLED=1`
+- Configure path/interval/rotation with:
+  - `METRICS_FILE` (default `/var/log/app-metrics.ndjson`)
+  - `METRICS_INTERVAL_MS` (default `1000`)
+  - `METRICS_MAX_BYTES` (default `52428800` = 50 MB)
+  - `METRICS_CGROUP_BASE` (default `/sys/fs/cgroup`)
+
+Example run with metrics and volume:
+
+```bash
+podman run \
+  --rm -p 4321:4321 -m 256m --cpus=1 \
+  -v $(pwd)/metrics:/app/metrics \
+  -e METRICS_SAMPLER_ENABLED=1 \
+  astro-cacher-leak:latest
+```
+
+### Run locally (dev) with metrics
+
+You can enable the sampler in dev mode. Container-only (cgroup) fields will be `null` outside a container; process metrics still record.
+
+```bash
+METRICS_SAMPLER_ENABLED=1 \
+METRICS_FILE=./metrics/app-metrics.ndjson \
+METRICS_INTERVAL_MS=1000 \
+npm run dev
+
+# In another terminal
+tail -f metrics/app-metrics.ndjson | jq .
+```
+
+### Run locally (preview) with metrics
+
+```bash
+npm run build
+METRICS_SAMPLER_ENABLED=1 \
+METRICS_FILE=./metrics/app-metrics.ndjson \
+METRICS_INTERVAL_MS=1000 \
+npm run preview
+
+# In another terminal
+tail -f metrics/app-metrics.ndjson | jq .
+```
+
+Example NDJSON record:
+
+```json
+{"ts":"2025-08-18T12:34:56.789Z","container":{"mem_current":183992320,"mem_max":268435456,"cpu_pct":72.5,"cpu_usage_usec":123456789,"cpu_throttled_usec":0,"cpu_effective_cores":1,"pids_current":5,"pids_max":64},"process":{"rss":152043520,"heap_used":89090872,"heap_total":128974848,"external":5123456,"array_buffers":2048,"heap_limit":2197815296,"evloop_ms_p50":3.2,"evloop_ms_p95":9.8,"evloop_ms_max":25.4}}
+```
+
+You can post-process NDJSON with `jq` or convert to CSV later.
 
 ## Troubleshooting
 

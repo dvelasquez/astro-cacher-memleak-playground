@@ -1,4 +1,5 @@
 import { Cacheable, type CacheableOptions } from "cacheable";
+import "./metrics";
 
 const GLOBAL_CACHE_TTL = "5m";
 
