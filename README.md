@@ -124,6 +124,12 @@ npm run preview   # preview the production build locally
 - Port: 4321
 - Health: `/health`
 
+## Running the build with low memory
+
+```bash
+node --max-old-space-size=64 ./dist/server/entry.mjs
+```
+
 ## Troubleshooting
 
 - Port busy: change host port mapping (`-p 3000:4321`).
