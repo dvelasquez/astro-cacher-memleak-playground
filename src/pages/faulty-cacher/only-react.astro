@@ -1,17 +1,17 @@
 ---
-import { ComplexComponent } from '../../components/withReact/ComplexComponent.tsx';
+import { ComplexComponent } from '../../components/withReact/ComplexComponent';
 import { createFixture, type FixtureType } from '../../data/fixtureType';
 import Shell from '../../layout/Shell.astro';
-import Cacher from '../../utils/CacherComponent.astro';
-import cache from '../../utils/cache';
+import Cacher from '../../utils/FaultyCacherComponent.astro';
+import faultyCache from '../../utils/faulty-cache';
 
 export const prerender = false;
 
-let sampleFixture = await cache?.get<FixtureType>("only-astro");
+let sampleFixture = await faultyCache?.get<FixtureType>("only-astro");
 
 if (!sampleFixture) {
   sampleFixture = createFixture({ sizeInKB: 200 });
-  await cache?.set("only-astro", sampleFixture, "10s");
+  await faultyCache?.set("only-astro", sampleFixture, "10s");
 }
 ---
 

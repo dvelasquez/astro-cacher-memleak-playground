@@ -45,4 +45,4 @@ USER astro
 EXPOSE 4321
 
 # Start the application
-CMD ["node", "dist/server/entry.mjs"]
+CMD ["node","--max-old-space-size=32", "--heapsnapshot-near-heap-limit=1", "dist/server/entry.mjs"]

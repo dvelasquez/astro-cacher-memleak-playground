@@ -10,11 +10,12 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   adapter: node({
-    mode: 'standalone'
+    mode: 'standalone',
   }),
   server: {
     host: true
   },
+  output: 'server',
 
   integrations: [react()],
 

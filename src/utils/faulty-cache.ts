@@ -1,8 +1,8 @@
-import { Cacheable, KeyvCacheableMemory, type CacheableOptions } from "cacheable";
+import { Cacheable, type CacheableOptions } from "cacheable";
 
 const GLOBAL_CACHE_TTL = "5m";
 
-let cache: Cacheable | null = null;
+let faultyCache: Cacheable | null = null;
 
 /**
  * Initialize cache with Redis as secondary storage if available
@@ -10,30 +10,24 @@ let cache: Cacheable | null = null;
  */
 async function initializeCache(): Promise<Cacheable> {
 
-  const memoryCache = new KeyvCacheableMemory({
-    ttl: GLOBAL_CACHE_TTL,
-    checkInterval: 0,
-  });
-
   const cacheOptions: CacheableOptions = {
     ttl: GLOBAL_CACHE_TTL,
     stats: true,
-    primary: memoryCache,
   };
 
   return new Cacheable(cacheOptions);
 }
 
 // Initialize cache instance
-if (!cache) {
-  cache = await initializeCache();
+if (!faultyCache) {
+  faultyCache = await initializeCache();
 }
 
 setInterval(() => {
-  console.log(JSON.stringify(cache?.stats, null, 2));
+  console.log(JSON.stringify(faultyCache?.stats, null, 2));
   console.log(JSON.stringify(process.memoryUsage(), null, 2));
 }, 1000);
 
 console.log("Cache initialized");
 
-export default cache;
+export default faultyCache;
